@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="10dp"
+    android:paddingTop="10dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="10dp"
+    tools:context=".LoginActivity">
+
+
+    <AutoCompleteTextView
+        android:id="@+id/phone_number_field_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+
+        android:hint="@string/enter_phone_number"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:textColor="@color/green"
+        android:textColorHint="@color/green"
+        android:inputType="text"
+
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <AutoCompleteTextView
+        android:id="@+id/verification_code_field_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:hint="@string/verification_code"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:textColor="@color/green"
+        android:textColorHint="@color/green"
+        android:inputType="text"
+        android:enabled="false"
+
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/phone_number_field_view" />
+
+    <Button
+        android:id="@+id/send_verification_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:layout_marginTop="8dp"
+        android:background="@color/green"
+        android:onClick="verificationButton"
+
+
+        android:text="@string/send_verification_code"
+
+        android:textColor="@color/white"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/verification_code_field_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

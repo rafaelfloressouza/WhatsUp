@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "700376433768",
+    "firebase_url": "https://whatsup-ecea5.firebaseio.com",
+    "project_id": "whatsup-ecea5",
+    "storage_bucket": "whatsup-ecea5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700376433768:android:312d0d654669fb72ba67dd",
+        "android_client_info": {
+          "package_name": "com.rafaelfloressouza.WhatsUp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700376433768-r6h2hsv9hman1jmku7sflmr71dlecu8q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoWI-IfUyvi9H2oQApDRcZa7Ocfq47kBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700376433768-r6h2hsv9hman1jmku7sflmr71dlecu8q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
