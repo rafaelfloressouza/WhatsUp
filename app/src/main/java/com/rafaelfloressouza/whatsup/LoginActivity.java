@@ -2,10 +2,8 @@ package com.rafaelfloressouza.whatsup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -24,11 +22,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.rafaelfloressouza.whatsup.DashBoardActivity;
-import com.rafaelfloressouza.whatsup.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
@@ -160,7 +161,35 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
 
                 if (task.isSuccessful()) { // If signing process with the respective credential is successful and inputs are valid
-                    userIsLoggedIn();
+
+                    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                    if(user != null){
+                        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
+
+                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                if(!dataSnapshot.exists()){
+                                    Map<String, Object> userMap = new HashMap<>();
+                                    userMap.put("phone", user.getPhoneNumber());
+                                    userMap.put("name", user.getPhoneNumber());
+                                    mDatabase.updateChildren(userMap);
+                                }
+                                userIsLoggedIn();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+
+                            }
+                        });
+                    }
+
+
+
                 }
             }
         });
@@ -171,14 +200,18 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) { // Signing into the user's dashboard.
 
-            Toast.makeText(LoginActivity.this, "Login In...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "Logging In...", Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     finish();
-                    startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                    try{
+                        startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                    }catch (Exception e){
+                        Log.d("WhatsUp", "error: " + e.toString());
+                    }
                 }
-            }, 2000);
+            }, 1000);
 
         }
     }

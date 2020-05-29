@@ -22,7 +22,7 @@
         android:maxLines="1"
         android:textColor="@color/green"
         android:textColorHint="@color/green"
-        android:inputType="text"
+        android:inputType="number|phone"
 
 
         app:layout_constraintBottom_toBottomOf="parent"
@@ -41,7 +41,7 @@
         android:maxLines="1"
         android:textColor="@color/green"
         android:textColorHint="@color/green"
-        android:inputType="text"
+        android:inputType="number"
         android:enabled="false"
 
         app:layout_constraintLeft_toRightOf="parent"
