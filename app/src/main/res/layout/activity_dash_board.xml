@@ -2,24 +2,37 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dash_board_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.rafaelfloressouza.whatsup.DashBoardActivity"
     android:orientation="vertical"
-    android:id="@+id/dash_board_drawer_layout">
+    tools:context="com.rafaelfloressouza.whatsup.DashBoardActivity">
 
     <include
-        android:layout_height="match_parent"
+        layout="@layout/dashboard_content"
         android:layout_width="match_parent"
-        layout="@layout/dashboard_content"/>
+        android:layout_height="match_parent" />
 
     <com.google.android.material.navigation.NavigationView
+        android:id="@+id/dash_board_navigation_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/dash_board_navigation_view"
-        app:menu="@menu/sliding_menu"
-        app:headerLayout="@layout/sliding_menu_header"
+        android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        android:layout_gravity="start"/>
+        app:headerLayout="@layout/sliding_menu_header"
+        app:menu="@menu/sliding_menu">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/user_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="100dp"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="5dp"
+            android:scrollbars="vertical">
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

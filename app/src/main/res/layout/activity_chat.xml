@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.rafaelfloressouza.whatsup.ChatActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/messages_recycler_view"
+        android:layout_above="@id/send_layout"
+    />
+    
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/send_layout"
+        >
+        <EditText
+            android:layout_weight="0.8"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_input"
+            android:hint="Enter a message">
+        </EditText>
+
+        <Button
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/send_button"
+            android:onClick="sendMessageButton"/>
+    </LinearLayout>
+
+</RelativeLayout>

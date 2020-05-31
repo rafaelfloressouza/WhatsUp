@@ -6,13 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.ContactsContract;
+import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,6 +25,14 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class DashBoardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -28,19 +41,35 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
 
     // Variables will be used to connect code and layout.
-    DrawerLayout mDrawerLayout;
-    ActionBarDrawerToggle mToggle;
-    NavigationView mNavigationView;
-    ViewPager mViewPager;
-    TabLayout mTabLayout;
-    TabItem mChatsItem, mGroupsItem, mCallsItem;
-    Toolbar toolbar;
-    PagerAdapter mPagerAdapter;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mToggle;
+    private NavigationView mNavigationView;
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
+    private TabItem mChatsItem, mGroupsItem, mCallsItem;
+    private Toolbar toolbar;
+    private PagerAdapter mPagerAdapter;
+
+
+    // Variables for Recycler View inside Navigation View
+    private RecyclerView mUserList;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    ArrayList<User> userList, contactList; // Used to store all contacts on phone.
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+
+        // Initializing both lists to empty lists.
+        contactList = new ArrayList<>();
+        userList = new ArrayList<>();
+
+        initializeRecyclerView(); // Setting up the Recycler View with all of its components.
+        getContacts(); // Populating userList with all contacts on phone.
 
         getPermissions(); // Getting permission from user to access phone's contacts.
 
@@ -129,11 +158,12 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         //TODO: Implement this portion once you figure out recycler view inside
+//        mDrawerLayout.closeDrawer(Gravity.START, false);
         return false;
     }
 
     public void findUser() {
-        startActivity(new Intent(getApplicationContext(), FindUserActivity.class));
+//        startActivity(new Intent(getApplicationContext(), FindUserActivity.class));
     }
 
     private void logMeOut() {
@@ -150,4 +180,106 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CODE);
         }
     }
+
+    private void getContacts() {
+
+        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        String countryISO = getCountryISO();
+
+        while (phones.moveToNext()) { // While there is a contact
+            String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String phone = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+            // Making sure the phone numbers will be in only one format
+            phone = phone.replace(" ", "");
+            phone = phone.replace("-", "");
+            phone = phone.replace("(", "");
+            phone = phone.replace(")", "");
+
+            if (!String.valueOf(phone.charAt(0)).equals("+")) {
+                phone = countryISO + phone;
+            }
+
+            // Adding new user from contacts into user list.
+            User newContact = new User("",name, phone);
+            contactList.add(newContact);
+            //Updating the recycler view
+            getUserDetails(newContact);
+        }
+        phones.close(); // Closing the phones Cursor.
+    }
+
+    private void getUserDetails(User newContact) {
+
+        DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
+        Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String phone = "", name = "";
+                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                        if (childSnapshot.child("phone").getValue() != null) {
+                            phone = childSnapshot.child("phone").getValue().toString();
+                        }
+
+                        if (childSnapshot.child("name").getValue() != null) {
+                            name = childSnapshot.child("name").getValue().toString();
+                        }
+
+                        User mUser = new User(childSnapshot.getKey(), name, phone);
+                        if (name.equals(phone)) {
+                            for (User mContactIterator : contactList) {
+                                if (mContactIterator.getPhone().equals(mUser.getPhone())) {
+                                    mUser.setName(mContactIterator.getName());
+                                }
+                            }
+                        }
+
+                        userList.add(mUser);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private String getCountryISO() {
+        String iso = null;
+
+        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+        if (telephonyManager.getNetworkCountryIso() != null) {
+
+            if (!telephonyManager.getNetworkCountryIso().toString().equals("")) {
+                iso = telephonyManager.getNetworkCountryIso().toString();
+            }
+        }
+
+        return CountryToPhonePrefix.getPhone(iso);
+    }
+
+
+    private void initializeRecyclerView() {
+
+        // Setting up Recycler View
+        mUserList = findViewById(R.id.user_list);
+        mUserList.setNestedScrollingEnabled(false); // Making the recycle view scroll seemlesly.
+        mUserList.setHasFixedSize(false);
+
+        //  Setting up Layout Manager
+        mLayoutManager = new LinearLayoutManager(DashBoardActivity.this, RecyclerView.VERTICAL, false);
+        mUserList.setLayoutManager(mLayoutManager);
+
+        // Setting up the Adapter
+        mAdapter = new UserListAdapter(userList);
+        mUserList.setAdapter(mAdapter);
+    }
+
+
 }
