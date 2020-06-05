@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_grey"
     android:paddingLeft="10dp"
     android:paddingTop="10dp"
     android:paddingRight="10dp"
@@ -11,58 +12,102 @@
     tools:context=".LoginActivity">
 
 
-    <AutoCompleteTextView
-        android:id="@+id/phone_number_field_view"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Spinner
+        android:id="@+id/county_code_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/phone_number_layout"/>
 
-
-        android:hint="@string/enter_phone_number"
-        android:imeOptions="actionDone"
-        android:maxLines="1"
-        android:textColor="@color/green"
-        android:textColorHint="@color/green"
-        android:inputType="number|phone"
-
-
+    <LinearLayout
+        android:id="@+id/phone_number_layout"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintRight_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Phone Number"
+            android:textColor="@color/base_green"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
 
-    <AutoCompleteTextView
-        android:id="@+id/verification_code_field_view"
-        android:layout_width="match_parent"
+        <AutoCompleteTextView
+            android:id="@+id/phone_number_field_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:imeOptions="actionDone"
+            android:inputType="number|phone"
+            android:maxLines="1"
+            android:textColor="@color/light_gray"
+            android:textStyle="bold"
+            android:theme="@style/CustomEditTextTheme" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/phone_verification_layout"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15sp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/phone_number_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
-        android:hint="@string/verification_code"
-        android:imeOptions="actionDone"
-        android:maxLines="1"
-        android:textColor="@color/green"
-        android:textColorHint="@color/green"
-        android:inputType="number"
-        android:enabled="false"
+        <TextView
+            android:id="@+id/verification_code_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Verification Code"
+            android:textColor="@color/base_green"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-        app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintRight_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/phone_number_field_view" />
+
+        <AutoCompleteTextView
+            android:id="@+id/verification_code_field_view"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLines="1"
+            android:textColor="@color/light_gray"
+            android:textStyle="bold"
+            android:theme="@style/CustomEditTextTheme" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/send_verification_button"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="50dp"
-
-        android:layout_marginTop="8dp"
-        android:background="@color/green"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/custom_button_background"
         android:onClick="verificationButton"
-
-
         android:text="@string/send_verification_code"
-
-        android:textColor="@color/white"
+        android:textColor="@color/dark_grey"
+        android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="parent"
         app:layout_constraintRight_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/verification_code_field_view" />
+        app:layout_constraintTop_toBottomOf="@id/phone_verification_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,16 +30,21 @@ import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
+    // Constants
+    int PICK_IMAGE_INTENT = 1;
+
     // Variables to connect code to layout.
     EditText mMessage;
     Button mSendMessage;
+    Button mAddMedia;
 
     // // Variables for Recycler View Containing chats between two people.
-    private RecyclerView mChat;
-    private RecyclerView.Adapter mChatAdapter;
-    private RecyclerView.LayoutManager mChatLayoutManager;
+    private RecyclerView mChat, mMedia;
+    private RecyclerView.Adapter mChatAdapter, mMediaAdapter;
+    private RecyclerView.LayoutManager mChatLayoutManager, mMediaLayoutManager;
 
     ArrayList<MessageObject> messageList; // Used to store all messages.
+    ArrayList<String> mediaURIList; // Used to store URIs for images.
 
     String chatID;
     DatabaseReference mChatDB;
@@ -48,13 +54,17 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        mediaURIList = new ArrayList<>();
+
         chatID = getIntent().getExtras().getString("chatID"); // Getting the chat id as an extra from other activity.
         mChatDB = FirebaseDatabase.getInstance().getReference().child("chat").child(chatID);
 
         mSendMessage = (Button) findViewById(R.id.send_button);
+        mAddMedia = (Button) findViewById(R.id.media_button);
         mMessage = (EditText) findViewById(R.id.message_input);
 
-        initializeRecyclerView();
+        initializeMessage();
+        initializeMedia();
         getChatMessages();
     }
 
@@ -63,13 +73,13 @@ public class ChatActivity extends AppCompatActivity {
         mChatDB.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if(dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
                     String text = "", creatorID = "";
 
-                    if(dataSnapshot.child("text").getValue() != null){
+                    if (dataSnapshot.child("text").getValue() != null) {
                         text = dataSnapshot.child("text").getValue().toString();
                     }
-                    if(dataSnapshot.child("creator").getValue() != null){
+                    if (dataSnapshot.child("creator").getValue() != null) {
                         creatorID = dataSnapshot.child("creator").getValue().toString();
                     }
 
@@ -102,15 +112,44 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    public void sendMessageButton(View view){
-//        Toast.makeText(this, FirebaseAuth.getInstance().getUid(), Toast.LENGTH_SHORT).show();
+    public void addMediaButton(View view) {
+        openGallery();
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture(s)"), PICK_IMAGE_INTENT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE_INTENT) {
+                if (data.getClipData() == null) { // User only picked one image.
+                    mediaURIList.add(data.getData().toString());
+                } else { // If user picks multiple images.
+                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                        mediaURIList.add(data.getClipData().getItemAt(i).getUri().toString());
+                    }
+                }
+                mMediaAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    public void sendMessageButton(View view) {
         sendMessage();
     }
 
     private void sendMessage() {
 
-        if(!mMessage.getText().toString().isEmpty()){ // If there is a message to send.
-            DatabaseReference newMessageDB =  mChatDB.push();
+        if (!mMessage.getText().toString().isEmpty()) { // If there is a message to send.
+            DatabaseReference newMessageDB = mChatDB.push();
 
             Map<String, Object> newMessageMap = new HashMap<>();
             newMessageMap.put("text", mMessage.getText().toString());
@@ -120,7 +159,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessage.setText(null);
     }
 
-    private void initializeRecyclerView() {
+    private void initializeMessage() {
 
         messageList = new ArrayList<>();
 
@@ -136,5 +175,21 @@ public class ChatActivity extends AppCompatActivity {
         // Setting up the Adapter
         mChatAdapter = new MessageAdapter(messageList);
         mChat.setAdapter(mChatAdapter);
+    }
+
+    private void initializeMedia() {
+
+        // Setting up Recycler View
+        mMedia = findViewById(R.id.media_list);
+        mMedia.setNestedScrollingEnabled(false); // Making the recycle view scroll seemlesly.
+        mMedia.setHasFixedSize(false);
+
+        //  Setting up Layout Manager
+        mMediaLayoutManager = new LinearLayoutManager(getApplicationContext(), RecyclerView.HORIZONTAL, false);
+        mMedia.setLayoutManager(mMediaLayoutManager);
+
+        // Setting up the Adapter
+        mMediaAdapter = new MediaAdapter(getApplicationContext(), mediaURIList);
+        mMedia.setAdapter(mMediaAdapter);
     }
 }

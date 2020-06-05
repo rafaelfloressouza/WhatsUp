@@ -20,6 +20,7 @@ import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabItem;
@@ -33,6 +34,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DashBoardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -89,7 +92,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         // Customizing the toolbar even more.
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_contacts);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_users_base_green);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount());
@@ -114,6 +117,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         });
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mAdapter.notifyDataSetChanged();
     }
 
     private void connectVariablesToLayout() {
@@ -181,8 +185,11 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         }
     }
 
+
+    Map<String, String> contactMap;
     private void getContacts() {
 
+        contactMap = new HashMap<>();
         Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
         String countryISO = getCountryISO();
 
@@ -202,6 +209,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
             // Adding new user from contacts into user list.
             User newContact = new User("",name, phone);
+            contactMap.put(phone, name);
             contactList.add(newContact);
             //Updating the recycler view
             getUserDetails(newContact);
@@ -209,35 +217,39 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         phones.close(); // Closing the phones Cursor.
     }
 
-    private void getUserDetails(User newContact) {
+    private void getUserDetails(final User newContact) {
 
-        DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
-        Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
+        final DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
+        final Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    String phone = "", name = "";
+                    String phone = "", name = "", userId = "";
+
                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+
+                        if(childSnapshot.exists())
+                            userId = childSnapshot.getKey();
+
                         if (childSnapshot.child("phone").getValue() != null) {
                             phone = childSnapshot.child("phone").getValue().toString();
                         }
 
                         if (childSnapshot.child("name").getValue() != null) {
                             name = childSnapshot.child("name").getValue().toString();
+
                         }
 
-                        User mUser = new User(childSnapshot.getKey(), name, phone);
-                        if (name.equals(phone)) {
-                            for (User mContactIterator : contactList) {
-                                if (mContactIterator.getPhone().equals(mUser.getPhone())) {
-                                    mUser.setName(mContactIterator.getName());
-                                }
-                            }
+                        if(contactMap.get(phone) != null && name.equals("unknown")){
+                            Map<String, Object> tmp = new HashMap<>();
+                            tmp.put("name", contactMap.get(phone));
+                            mDataBase.child(userId).updateChildren(tmp);
                         }
 
-                        userList.add(mUser);
+                        userList.add(new User(userId, contactMap.get(phone), phone));
                         mAdapter.notifyDataSetChanged();
+
                     }
                 }
             }

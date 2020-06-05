@@ -2,11 +2,15 @@ package com.rafaelfloressouza.whatsup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -89,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                 // As soon as an sms with the verification code is sent do the following:
                 mVerificationId = issuedVerificationCode; // Saving the verification code sent by Firebase.
                 mCodeTextView.setEnabled(true);
-                mCodeTextView.setTextColor(getResources().getColor(R.color.green));
+//                mCodeTextView.setTextColor(getResources().getColor(R.color.green));
                 mVerifyButton.setText("Insert Code");
             }
         };
@@ -109,16 +113,41 @@ public class LoginActivity extends AppCompatActivity {
         boolean errorDetected = false;
         View focusView = null;
 
+        // Variables used to customize the error message
+        int errorColor;
+        final int version = Build.VERSION.SDK_INT;
+
+        //Get the defined errorColor from color resource depending on SDK version
+        if (version >= 23) {
+            errorColor = ContextCompat.getColor(getApplicationContext(), R.color.error_red);
+        } else {
+            errorColor = getResources().getColor(R.color.error_red);
+        }
+
+
         // Checking that phone number field is not empty.
         if (TextUtils.isEmpty(phoneNumber)) {
-            mNumberTextView.setError("Phone Number required");
+
+            // Customizing error messsage.
+            String errorString =  "Phone Number required";
+            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(errorColor);
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(errorString);
+            spannableStringBuilder.setSpan(foregroundColorSpan, 0, errorString.length(), 0);
+            mNumberTextView.setError(spannableStringBuilder);
             focusView = mNumberTextView;
             errorDetected = true;
         }
 
         // Checking that verification code field is not empty.
         if (TextUtils.isEmpty(verificationCode) && mVerificationId != null) {
-            mCodeTextView.setError("Verification Code required");
+
+
+            // Customizing error message.
+            String errorString = "Verification Code Required";  // Your custom error message.
+            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(errorColor);
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(errorString);
+            spannableStringBuilder.setSpan(foregroundColorSpan, 0, errorString.length(), 0);
+            mCodeTextView.setError(spannableStringBuilder);
             focusView = mCodeTextView;
             errorDetected = true;
         }
@@ -164,17 +193,17 @@ public class LoginActivity extends AppCompatActivity {
 
                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                    if(user != null){
+                    if (user != null) {
                         final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
 
                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                if(!dataSnapshot.exists()){
+                                if (!dataSnapshot.exists()) {
                                     Map<String, Object> userMap = new HashMap<>();
+                                    userMap.put("name", "unknown");
                                     userMap.put("phone", user.getPhoneNumber());
-                                    userMap.put("name", user.getPhoneNumber());
                                     mDatabase.updateChildren(userMap);
                                 }
                                 userIsLoggedIn();
@@ -187,7 +216,6 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
                     }
-
 
 
                 }
@@ -205,9 +233,9 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     finish();
-                    try{
+                    try {
                         startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Log.d("WhatsUp", "error: " + e.toString());
                     }
                 }

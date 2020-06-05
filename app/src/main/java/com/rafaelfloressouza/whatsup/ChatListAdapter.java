@@ -43,7 +43,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
     public void onBindViewHolder(@NonNull final ChatListViewHolder holder, final int position) {
 
         // Setting the text view's name and phone to the the corresponding Chat present in the ChatList.
-        holder.mTitle.setText(chatList.get(position).getChatId());
+        holder.mTitle.setText(chatList.get(position).getName());
 
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +69,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
 
         public ChatListViewHolder(View view){
             super(view);
+
             mTitle = view.findViewById(R.id.chat_title);
             mLayout = view.findViewById(R.id.chat_item_layout);
         }

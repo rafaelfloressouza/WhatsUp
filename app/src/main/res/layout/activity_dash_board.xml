@@ -22,17 +22,21 @@
         app:headerLayout="@layout/sliding_menu_header"
         app:menu="@menu/sliding_menu">
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/user_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="30dp"
             android:paddingStart="5dp"
             android:paddingTop="5dp"
             android:paddingEnd="5dp"
-            android:scrollbars="vertical">
-        </androidx.recyclerview.widget.RecyclerView>
+            android:scrollbars="vertical"
+            android:background="@color/dark_grey"/>
 
     </com.google.android.material.navigation.NavigationView>
+
+
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

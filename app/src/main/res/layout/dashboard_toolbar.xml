@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:theme="@style/CustomToolbarTheme"
-    android:elevation="4dp">
+    android:elevation="10dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:textSize="17sp"
         android:textStyle="bold"
-        android:textColor="@color/white"
+        android:textColor="@color/base_green"
         />
 
 </androidx.appcompat.widget.Toolbar>
