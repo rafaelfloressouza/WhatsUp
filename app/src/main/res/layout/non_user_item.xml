@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/user_item_layout"
+    android:id="@+id/non_user_item_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -29,7 +29,7 @@
             android:layout_weight="0.99">
 
             <TextView
-                android:id="@+id/user_name"
+                android:id="@+id/non_user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -39,7 +39,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/user_phone"
+                android:id="@+id/non_user_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/phone"
@@ -48,5 +48,17 @@
                 android:textColor="@color/white" />
 
         </LinearLayout>
+
+        <Button
+            android:layout_width="50dp"
+            android:layout_marginEnd="10dp"
+            android:layout_height="20dp"
+            android:id="@+id/selection_button"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/custom_button_background"
+            android:text="@string/invite"
+            android:textSize="10sp"
+            android:textColor="@color/dark_grey" />
+
     </LinearLayout>
 </LinearLayout>

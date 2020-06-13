@@ -13,8 +13,11 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,7 +34,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.hbb20.CountryCodePicker;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +46,9 @@ public class LoginActivity extends AppCompatActivity {
 
     // Constants
     final private int TIMEOUT_DURATION = 60;
+
+    // Variable used to control the country ISO spinner
+    CountryCodePicker mSpinner;
 
     // Variables used to connect layout with code
     private Button mVerifyButton;
@@ -62,6 +71,12 @@ public class LoginActivity extends AppCompatActivity {
         mNumberTextView = (AutoCompleteTextView) findViewById(R.id.phone_number_field_view);
         mCodeTextView = findViewById(R.id.verification_code_field_view);
 
+        // Connecting code with the spinner.
+        mSpinner = (CountryCodePicker) findViewById(R.id.country_code_spinner);
+        mSpinner.registerCarrierNumberEditText(mNumberTextView);
+        mSpinner.setNumberAutoFormattingEnabled(true);
+
+
         FirebaseApp.initializeApp(this);
 
         //Checking if the user is already logged in. If so, we don't do the verification and we go directly to the dashboard.
@@ -83,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
-                Toast.makeText(LoginActivity.this, "Invalid Phone Number", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Error verifying phone number\nMake sure you have reception.", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -93,7 +108,6 @@ public class LoginActivity extends AppCompatActivity {
                 // As soon as an sms with the verification code is sent do the following:
                 mVerificationId = issuedVerificationCode; // Saving the verification code sent by Firebase.
                 mCodeTextView.setEnabled(true);
-//                mCodeTextView.setTextColor(getResources().getColor(R.color.green));
                 mVerifyButton.setText("Insert Code");
             }
         };
@@ -138,6 +152,13 @@ public class LoginActivity extends AppCompatActivity {
             errorDetected = true;
         }
 
+        if(!mSpinner.isValidFullNumber()){ // If numbers is invalid for the country selected.
+            Toast.makeText(LoginActivity.this, "Invalid Phone Number", Toast.LENGTH_SHORT).show();
+            focusView = mNumberTextView;
+            errorDetected = true;
+        }
+
+
         // Checking that verification code field is not empty.
         if (TextUtils.isEmpty(verificationCode) && mVerificationId != null) {
 
@@ -159,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void verificationButton(View view) {
+
         if (validateInputs()) { // If inputs are valid:
 
             if (mVerificationId != null) { // If a verification code was issued by Firebase.
@@ -171,18 +193,21 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void verifyPhoneNumberWithCode() {
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, mCodeTextView.getText().toString());
+        String code = mCodeTextView.getText().toString();
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
         signInWithCredential(credential);
     }
 
     private void performPhoneNumberVerification() {
 
         // Verifying a new phone number for which no verification code has been issued.
-        String phoneNumber = mNumberTextView.getText().toString();
+        String phoneNumber =  mSpinner.getFullNumberWithPlus();
+//        String phoneNumber = mNumberTextView.getText().toString();
         mPhoneAuth.verifyPhoneNumber(phoneNumber, TIMEOUT_DURATION, TimeUnit.SECONDS, this, mCallbacks);
     }
 
     private void signInWithCredential(PhoneAuthCredential phoneAuthCredential) {
+
 
         // Using credential provided (phone number) to attempt to sign in.
         FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -190,6 +215,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
 
                 if (task.isSuccessful()) { // If signing process with the respective credential is successful and inputs are valid
+
 
                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -202,7 +228,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 if (!dataSnapshot.exists()) {
                                     Map<String, Object> userMap = new HashMap<>();
-                                    userMap.put("name", "unknown");
+//                                    userMap.put("name", "unknown");
                                     userMap.put("phone", user.getPhoneNumber());
                                     mDatabase.updateChildren(userMap);
                                 }
@@ -216,7 +242,6 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
                     }
-
 
                 }
             }
@@ -232,9 +257,9 @@ public class LoginActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    finish();
                     try {
                         startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                        finish();
                     } catch (Exception e) {
                         Log.d("WhatsUp", "error: " + e.toString());
                     }
@@ -243,6 +268,4 @@ public class LoginActivity extends AppCompatActivity {
 
         }
     }
-
-
 }

@@ -6,10 +6,4 @@
         android:id="@+id/log_out_item"
         android:title="Log Out"
         app:showAsAction="collapseActionView" />
-
-    <item
-        android:id="@+id/find_user_item"
-        android:title="Find"
-        app:showAsAction="never" />
-
 </menu>

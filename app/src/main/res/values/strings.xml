@@ -3,7 +3,7 @@
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="verification_code">Enter Code</string>
     <string name="send_verification_code">Send Verification Code</string>
-
+    <string name="invite">Invite</string>
     <string name="phone">phone</string>
     <string name="name">name</string>
     <string name="open">open</string>
@@ -13,7 +13,4 @@
     <string name="calls">Calls</string>
     <string name="contacts">Contacts</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-
-    <!-- TODO: Remove or change this placeholder text -->
 </resources>

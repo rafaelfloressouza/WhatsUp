@@ -1,6 +1,7 @@
 package com.rafaelfloressouza.whatsup;
 
-
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
@@ -38,8 +46,39 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull MessageViewHolder holder, final int position) {
 
         holder.mMessage.setText(messageList.get(position).getMessage());
-        holder.mSender.setText(messageList.get(position).getSenderId());
+        holder.sent_at.setText(messageList.get(position).getSentAt());
+
+        if (!messageList.get(position).getSenderId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+            // Some else's message
+
+            holder.mLayout.setGravity(Gravity.LEFT);
+
+            if (holder.mMessage.length() <= 7) {
+                holder.inChatLayout.getLayoutParams().width = 220;
+            } else {
+                holder.inChatLayout.getLayoutParams().width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            }
+
+            holder.inChatLayout.setBackgroundResource(R.drawable.incoming_speech_bubble);
+            holder.inChatLayout.setPadding(45, 4, 12, 10);
+        } else {
+
+            // Message send by the owner of the phone
+
+            holder.mLayout.setGravity(Gravity.RIGHT);
+
+            if (holder.mMessage.length() <= 7) {
+                holder.inChatLayout.getLayoutParams().width = 220;
+            } else {
+                holder.inChatLayout.getLayoutParams().width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            }
+
+            holder.inChatLayout.setBackgroundResource(R.drawable.outgoing_speech_bubble);
+            holder.inChatLayout.setPadding(12, 4, 45, 10);
+        }
     }
+
 
     @Override
     public int getItemCount() {
@@ -48,13 +87,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mMessage, mSender;
+        TextView mMessage, sent_at;
         LinearLayout mLayout;
+        LinearLayout inChatLayout;
 
-         MessageViewHolder(View view) {
+        MessageViewHolder(View view) {
             super(view);
-             mMessage = view.findViewById(R.id.in_chat_message);
-             mSender = view.findViewById(R.id.in_chat_sender);
+            mMessage = view.findViewById(R.id.in_chat_message);
+            mLayout = view.findViewById(R.id.linear_layout_message_item);
+            inChatLayout = view.findViewById(R.id.in_chat_linear_layout);
+            sent_at = view.findViewById(R.id.in_chat_sent_at);
         }
     }
 }

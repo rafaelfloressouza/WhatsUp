@@ -20,7 +20,6 @@ import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabItem;
@@ -42,8 +41,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
     // Constants
     final int REQUEST_CODE = 123;
 
-
-    // Variables will be used to connect code and layout.
+    // Variables for Tab Menu
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
     private NavigationView mNavigationView;
@@ -53,32 +51,40 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
     private Toolbar toolbar;
     private PagerAdapter mPagerAdapter;
 
-
-    // Variables for Recycler View inside Navigation View
+    // Variables for Recycler View inside Navigation View Containing Users of the App
     private RecyclerView mUserList;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.Adapter mUserListAdapter;
+    private RecyclerView.LayoutManager mUserLayoutManager;
 
-    ArrayList<User> userList, contactList; // Used to store all contacts on phone.
+    // Variables for Recycler View inside Navigation View Containing Non-Users of the App
+    private RecyclerView mNonUserList;
+    private RecyclerView.Adapter mNonUserListAdapter;
+    private RecyclerView.LayoutManager mNonUserLayoutManager;
 
+    // Lists to store Users and Non-Users of the App
+    ArrayList<User> userList, contactList, nonUserList;
+
+    // Maps to ease search of names of users who use the app by using their phone numbers
+    private Map<String, String> userMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        // Initializing both lists to empty lists.
-        contactList = new ArrayList<>();
         userList = new ArrayList<>();
+        nonUserList = new ArrayList<>();
 
-        initializeRecyclerView(); // Setting up the Recycler View with all of its components.
-        getContacts(); // Populating userList with all contacts on phone.
+        // Set up User and Non-User Recycler View
+        initializeUserRecyclerView();
+        initializeNonUserRecyclerView();
 
-        getPermissions(); // Getting permission from user to access phone's contacts.
+        getContacts(); // Populating userList and nonUserList with the right contacts on phone.
+        getPermissionToAccessContacts();
 
         // Setting up the toolbar.
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar); // Setting up custom toolbar.
+        setSupportActionBar(toolbar);
 
         // Connecting variables to layout components.
         connectVariablesToLayout();
@@ -95,9 +101,8 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_users_base_green);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount());
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount(), userMap, null);
         mViewPager.setAdapter(mPagerAdapter);
-
 
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -115,9 +120,8 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
             }
         });
-
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mAdapter.notifyDataSetChanged();
+        mUserListAdapter.notifyDataSetChanged();
     }
 
     private void connectVariablesToLayout() {
@@ -142,10 +146,6 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
                     }
                 }, 1000);
                 break;
-            case R.id.find_user_item:
-                // Find
-                findUser();
-                break;
             default:
                 // Just to be safe!
         }
@@ -166,10 +166,6 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         return false;
     }
 
-    public void findUser() {
-//        startActivity(new Intent(getApplicationContext(), FindUserActivity.class));
-    }
-
     private void logMeOut() {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(DashBoardActivity.this, LoginActivity.class);
@@ -178,18 +174,16 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         startActivity(intent);
     }
 
-    // Getting permission to access contacts
-    private void getPermissions() {
+    private void getPermissionToAccessContacts() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CODE);
         }
     }
 
-
-    Map<String, String> contactMap;
     private void getContacts() {
 
-        contactMap = new HashMap<>();
+        userMap = new HashMap<>();
+
         Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
         String countryISO = getCountryISO();
 
@@ -207,11 +201,9 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
                 phone = countryISO + phone;
             }
 
-            // Adding new user from contacts into user list.
-            User newContact = new User("",name, phone);
-            contactMap.put(phone, name);
-            contactList.add(newContact);
-            //Updating the recycler view
+            User newContact = new User("", name, phone);
+            userMap.put(phone, name);
+
             getUserDetails(newContact);
         }
         phones.close(); // Closing the phones Cursor.
@@ -221,36 +213,35 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
         final DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
         final Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
+
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
+
+                if (dataSnapshot.exists()) { // User found on Firebase....
+
                     String phone = "", name = "", userId = "";
 
                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
 
-                        if(childSnapshot.exists())
+                        if (childSnapshot.exists()) {
+
                             userId = childSnapshot.getKey();
 
-                        if (childSnapshot.child("phone").getValue() != null) {
-                            phone = childSnapshot.child("phone").getValue().toString();
+                            if (childSnapshot.child("phone").getValue() != null) {
+                                phone = childSnapshot.child("phone").getValue().toString();
+                            }
+
+                            userList.add(new User(userId, userMap.get(phone), phone));
+                            mUserListAdapter.notifyDataSetChanged();
+
                         }
-
-                        if (childSnapshot.child("name").getValue() != null) {
-                            name = childSnapshot.child("name").getValue().toString();
-
-                        }
-
-                        if(contactMap.get(phone) != null && name.equals("unknown")){
-                            Map<String, Object> tmp = new HashMap<>();
-                            tmp.put("name", contactMap.get(phone));
-                            mDataBase.child(userId).updateChildren(tmp);
-                        }
-
-                        userList.add(new User(userId, contactMap.get(phone), phone));
-                        mAdapter.notifyDataSetChanged();
-
                     }
+                } else { // User not found on Firebase
+
+                    nonUserList.add(newContact);
+                    mNonUserListAdapter.notifyDataSetChanged();
+
                 }
             }
 
@@ -259,7 +250,6 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
             }
         });
-
     }
 
     private String getCountryISO() {
@@ -276,22 +266,35 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         return CountryToPhonePrefix.getPhone(iso);
     }
 
+    private void initializeNonUserRecyclerView() {
 
-    private void initializeRecyclerView() {
+        // Setting up Recycler View
+        mNonUserList = findViewById(R.id.non_user_list);
+        mNonUserList.setNestedScrollingEnabled(false); // Making the recycler view scroll seemlesly.
+        mNonUserList.setHasFixedSize(false);
+
+        // Setting up Layout Manager
+        mNonUserLayoutManager = new LinearLayoutManager(DashBoardActivity.this, RecyclerView.VERTICAL, false);
+        mNonUserList.setLayoutManager(mNonUserLayoutManager);
+
+        // Setting up the Adapter
+        mNonUserListAdapter = new NonUserListAdapter(nonUserList);
+        mNonUserList.setAdapter(mNonUserListAdapter);
+    }
+
+    private void initializeUserRecyclerView() {
 
         // Setting up Recycler View
         mUserList = findViewById(R.id.user_list);
-        mUserList.setNestedScrollingEnabled(false); // Making the recycle view scroll seemlesly.
+        mUserList.setNestedScrollingEnabled(false); // Making the recycler view scroll seemlesly.
         mUserList.setHasFixedSize(false);
 
         //  Setting up Layout Manager
-        mLayoutManager = new LinearLayoutManager(DashBoardActivity.this, RecyclerView.VERTICAL, false);
-        mUserList.setLayoutManager(mLayoutManager);
+        mUserLayoutManager = new LinearLayoutManager(DashBoardActivity.this, RecyclerView.VERTICAL, false);
+        mUserList.setLayoutManager(mUserLayoutManager);
 
         // Setting up the Adapter
-        mAdapter = new UserListAdapter(userList);
-        mUserList.setAdapter(mAdapter);
+        mUserListAdapter = new UserListAdapter(userList);
+        mUserList.setAdapter(mUserListAdapter);
     }
-
-
 }

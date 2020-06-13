@@ -19,12 +19,27 @@
         app:layout_constraintLeft_toLeftOf="parent"
 
         android:src="@mipmap/ic_launcher"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/country_code_spinner"/>
 
-    <Spinner
-        android:id="@+id/county_code_spinner"
-        android:layout_width="match_parent"
+    <com.hbb20.CountryCodePicker
+        android:id="@+id/country_code_spinner"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:ccp_defaultLanguage="ENGLISH"
+        app:ccp_defaultNameCode="US"
+        app:ccp_contentColor="@color/base_green"
+        app:ccp_arrowColor="@color/white"
+        app:ccp_textSize="18sp"
+        app:ccp_arrowSize="25dp"
+        app:ccp_flagBorderColor="@android:color/transparent"
+        app:ccp_autoDetectCountry="true"
+        app:ccp_autoFormatNumber="true"
+        app:ccpDialog_allowSearch="true"
+        app:ccp_countryPreference="US"
+        app:ccp_countryAutoDetectionPref="SIM_NETWORK_LOCALE"
+
+
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginBottom="50dp"
         app:layout_constraintLeft_toLeftOf="parent"

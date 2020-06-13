@@ -9,16 +9,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Map;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class GroupsFragment extends Fragment {
 
     View viewToInflate;
 
-    public GroupsFragment() {
-        // Required empty public constructor
+    Map<String, String> groupMap;
+
+    public GroupsFragment(Map<String, String> groupMap) {
+        this.groupMap = groupMap;
     }
 
 

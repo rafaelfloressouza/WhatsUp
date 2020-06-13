@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -39,16 +41,15 @@ public class ChatsFragment extends Fragment {
     private RecyclerView.LayoutManager mChatLayoutManager;
 
     ArrayList<Chat> chatList;
+    Map<String, String> userMap;
 
-    public ChatsFragment() {
-        // Required empty public constructor
+    public ChatsFragment(Map<String, String> userMap) {
+        this.userMap = userMap;
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         this.viewToInflate = inflater.inflate(R.layout.chats_fragment, container, false);
 
@@ -59,28 +60,22 @@ public class ChatsFragment extends Fragment {
     }
 
     private void getChatList() {
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("chat");
-
-
-        // Worse option
-        DatabaseReference d = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("chat");
-
-        d.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("chat");
+        mDataBase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull final DataSnapshot snapshotI) {
+            public void onDataChange(@NonNull final DataSnapshot userChat) {
 
-                if(snapshotI.exists()){
+                if (userChat.exists()) {
 
-                    for (final DataSnapshot chatSnapshot: snapshotI.getChildren()){
+                    for (final DataSnapshot chatSnapshot : userChat.getChildren()) {
                         String otherUserId = chatSnapshot.getValue().toString();
-                        Query q = FirebaseDatabase.getInstance().getReference().child("user").child(otherUserId).child("name");
+                        Query q = FirebaseDatabase.getInstance().getReference().child("user").child(otherUserId).child("phone");
                         q.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshotII) {
-//                                    Toast.makeText(viewToInflate.getContext(), "HERE:" + snapshotII.getValue().toString(), Toast.LENGTH_LONG).show();
-                                    Chat mChat = new Chat(chatSnapshot.getKey(), snapshotII.getValue().toString());
-                                    chatList.add(mChat);
-                                    mChatAdapter.notifyDataSetChanged();
+                                Chat mChat = new Chat(chatSnapshot.getKey(), userMap.get(snapshotII.getValue().toString()));
+                                chatList.add(mChat);
+                                mChatAdapter.notifyDataSetChanged();
                             }
 
                             @Override
@@ -97,36 +92,6 @@ public class ChatsFragment extends Fragment {
 
             }
         });
-
-
-
-//        db.addListenerForSingleValueEvent(new ValueEventListener() { //TODO: Improve code.
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-//                        String otherUserId = dataSnapshot.getValue().toString();
-//                        Toast.makeText(viewToInflate.getContext(), otherUserId, Toast.LENGTH_SHORT).show();
-//                        Chat mChat = new Chat(childSnapshot.getKey(), "Something here");
-////                        boolean exists = false;
-////                        for (Chat chatIterator : chatList) {
-////                            if (chatIterator.getChatId().equals(mChat.getChatId()))
-////                                exists = true;
-////                        }
-////                        if (exists){
-////                            continue;
-////                        }
-//                        chatList.add(mChat);
-//                        mChatAdapter.notifyDataSetChanged();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
     }
 
     private void initializeRecyclerView() {

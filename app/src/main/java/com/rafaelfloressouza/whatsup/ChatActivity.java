@@ -3,14 +3,19 @@ package com.rafaelfloressouza.whatsup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +29,10 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.w3c.dom.Text;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +41,13 @@ public class ChatActivity extends AppCompatActivity {
     // Constants
     int PICK_IMAGE_INTENT = 1;
 
+    // Toolbar variable
+    private Toolbar chat_toolbar;
+
     // Variables to connect code to layout.
     EditText mMessage;
-    Button mSendMessage;
-    Button mAddMedia;
+    ImageButton mSendMessage;
+    ImageButton mAddMedia;
 
     // // Variables for Recycler View Containing chats between two people.
     private RecyclerView mChat, mMedia;
@@ -54,18 +65,40 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        //Setting up the toolbar
+        chat_toolbar = findViewById(R.id.in_chat_toolbar);
+        setSupportActionBar(chat_toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         mediaURIList = new ArrayList<>();
 
         chatID = getIntent().getExtras().getString("chatID"); // Getting the chat id as an extra from other activity.
         mChatDB = FirebaseDatabase.getInstance().getReference().child("chat").child(chatID);
 
-        mSendMessage = (Button) findViewById(R.id.send_button);
-        mAddMedia = (Button) findViewById(R.id.media_button);
+        mSendMessage = findViewById(R.id.send_button);
+        mAddMedia = findViewById(R.id.media_button);
         mMessage = (EditText) findViewById(R.id.message_input);
 
         initializeMessage();
         initializeMedia();
         getChatMessages();
+
+        mMessage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    sendMessage();
+                    handled = true;
+                }
+                return handled;
+            }
+        });
+    }
+
+    public void backButton(View view) {
+        // Returning back to the dashboard.
+        startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
     }
 
     private void getChatMessages() {
@@ -74,7 +107,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
-                    String text = "", creatorID = "";
+                    String text = "", creatorID = "", sent_at = "";
 
                     if (dataSnapshot.child("text").getValue() != null) {
                         text = dataSnapshot.child("text").getValue().toString();
@@ -83,13 +116,16 @@ public class ChatActivity extends AppCompatActivity {
                         creatorID = dataSnapshot.child("creator").getValue().toString();
                     }
 
-                    MessageObject mMessage = new MessageObject(dataSnapshot.getKey(), creatorID, text);
+                    if(dataSnapshot.child("sent_at").getValue() != null){
+                        sent_at = dataSnapshot.child("sent_at").getValue().toString();
+                    }
+
+                    MessageObject mMessage = new MessageObject(dataSnapshot.getKey(), creatorID, text, sent_at);
                     messageList.add(mMessage);
                     mChatLayoutManager.scrollToPosition(messageList.size() - 1); // Scrolls to last chat elements.
                     mChatAdapter.notifyDataSetChanged();
                 }
             }
-
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
@@ -150,10 +186,15 @@ public class ChatActivity extends AppCompatActivity {
 
         if (!mMessage.getText().toString().isEmpty()) { // If there is a message to send.
             DatabaseReference newMessageDB = mChatDB.push();
-
             Map<String, Object> newMessageMap = new HashMap<>();
             newMessageMap.put("text", mMessage.getText().toString());
             newMessageMap.put("creator", FirebaseAuth.getInstance().getUid());
+
+            // Formmating the date
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yy");
+            LocalDateTime current_date = LocalDateTime.now();
+            newMessageMap.put("sent_at", current_date.format(dtf));
+
             newMessageDB.updateChildren(newMessageMap);
         }
         mMessage.setText(null);
@@ -165,8 +206,9 @@ public class ChatActivity extends AppCompatActivity {
 
         // Setting up Recycler View
         mChat = findViewById(R.id.messages_recycler_view);
-        mChat.setNestedScrollingEnabled(false); // Making the recycle view scroll seemlesly.
-        mChat.setHasFixedSize(false);
+
+        // Setting up a decoration
+        mChat.addItemDecoration(new ChatActivityItemDecorator(this.getApplicationContext()));
 
         //  Setting up Layout Manager
         mChatLayoutManager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatListViewHolder> {
 
     private ArrayList<Chat> chatList;
+    private String chatID;
 
     public ChatListAdapter(ArrayList<Chat> chatList) {
         this.chatList = chatList;

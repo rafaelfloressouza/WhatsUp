@@ -4,13 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_grey"
+    android:id="@+id/chat_activity_relative_layout"
     tools:context="com.rafaelfloressouza.whatsup.ChatActivity">
+
+
+    <include
+        android:id="@+id/in_chat_toolbar"
+        layout="@layout/chat_toolbar"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages_recycler_view"
+        android:layout_marginTop="55dp"
+
+        android:paddingStart="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingEnd="5dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/send_layout" />
+        android:layout_above="@id/send_layout"
+        android:background="@color/light_gray"/>
 
     <LinearLayout
         android:id="@+id/send_layout"
@@ -20,15 +37,22 @@
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:background="@color/light_gray"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/media_list"/>
 
 
             <LinearLayout
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:background="@color/dark_grey"
+                android:elevation="20dp">
 
 
                 <EditText
@@ -36,23 +60,29 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.8"
-                    android:hint="Enter a message" />
+                    android:imeOptions="actionSend"
+                    android:inputType="textAutoCorrect"
+                    android:textColor="@color/white"/>
 
-                <Button
+                <ImageButton
                     android:id="@+id/media_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
                     android:onClick="addMediaButton"
-                    android:text="Media" />
+                    android:layout_gravity="center_vertical"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_attachment_base_green" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/send_button"
+                    android:layout_gravity="center_vertical"
                     android:layout_width="0dp"
+                    android:src="@drawable/ic_send_base_green"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
                     android:onClick="sendMessageButton"
-                    android:text="Send" />
+                    android:background="@android:color/transparent" />
             </LinearLayout>
     </LinearLayout>
 

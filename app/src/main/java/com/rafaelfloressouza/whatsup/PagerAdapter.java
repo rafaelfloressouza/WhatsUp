@@ -1,24 +1,22 @@
 package com.rafaelfloressouza.whatsup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-
-import java.util.ArrayList;
+import java.util.Map;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 
-//    private final ArrayList<Fragment> lastFragment = new ArrayList<>();
-//    private final ArrayList<String> lastTitles = new ArrayList<>();
-
-
     private int mTabsNumber;
+    private Map<String, String> userMap;
+    private Map<String, String> groupMap;
 
-    public PagerAdapter(@NonNull FragmentManager fm, int behavior, int tabNumber) {
+    public PagerAdapter(@NonNull FragmentManager fm, int behavior, int tabNumber, Map<String, String> userMap, Map<String, String> groupMap) {
         super(fm, behavior);
         this.mTabsNumber = tabNumber;
+        this.userMap = userMap;
+        this.groupMap = groupMap;
     }
 
     @NonNull
@@ -28,36 +26,18 @@ public class PagerAdapter extends FragmentPagerAdapter {
         // Selection the right fragment to display
         switch (position) {
             case 0:
-                return new ChatsFragment();
+                return new ChatsFragment(userMap);
             case 1:
-                return new GroupsFragment();
+                return new GroupsFragment(groupMap);
             case 2:
                 return new CallsFragment();
             default:
                 return null;
         }
-
-//      return lastFragment.get(position);
     }
 
     @Override
     public int getCount() {
         return mTabsNumber;
-//        return lastFragment.size();
     }
-
-//    @Nullable
-//    @Override
-//    public CharSequence getPageTitle(int position) {
-//        return lastTitles.get(position);
-//    }
-
-
-//    public void AddFragment (Fragment fragment, String title)
-//
-//
-//
-//
-
-
 }
