@@ -1,1 +1,1 @@
-# WhatsUp v.1.0
+# WhatsUp v1.0
