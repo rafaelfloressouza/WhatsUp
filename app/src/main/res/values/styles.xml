@@ -21,6 +21,11 @@
         <item name="android:background">@color/dark_grey</item>
     </style>
 
+    <!--For the Chats's Toolbar-->
+    <style name="FloatingButtonTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:backgroundTint">@color/base_green</item>
+    </style>
+
 
 
     <style name="CustomEditTextTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">

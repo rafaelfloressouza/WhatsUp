@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ChatsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -10,5 +11,17 @@
         android:layout_height="match_parent"
         android:id="@+id/chat_list"
         android:background="@color/dark_grey"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/new_chat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_add_dark_gray"
+        android:theme="@style/FloatingButtonTheme"
+        app:rippleColor="@color/white"
+        app:fabSize="auto"
+        android:elevation="20dp"
+        android:layout_margin="16dp" />
 
 </FrameLayout>

@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.4"
-                android:text="5/23/20"
+                android:text="06/14/20"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="@color/light_gray" />

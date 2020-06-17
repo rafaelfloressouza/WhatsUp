@@ -9,21 +9,21 @@
     <include
         android:id="@+id/toolbar"
         layout="@layout/dashboard_toolbar"
+        app:layout_constraintBottom_toTopOf="@id/dashboard_tab_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/dashboard_tab_layout"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/dashboard_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/dark_grey"
+        android:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:tabTextColor="@color/base_green"
-        android:background="@color/dark_grey"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        android:elevation="1dp">
+        app:tabTextColor="@color/base_green">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/chats_item"
@@ -49,10 +49,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="104dp"
+        android:background="@color/dark_grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@color/dark_grey"
-        app:layout_constraintTop_toBottomOf="@+id/dashboard_tab_layout" />
-
+        app:layout_constraintTop_toBottomOf="@+id/dashboard_tab_layout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

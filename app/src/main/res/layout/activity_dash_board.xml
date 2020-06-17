@@ -20,7 +20,7 @@
         android:fitsSystemWindows="true"
         android:layout_gravity="start"
         app:headerLayout="@layout/sliding_menu_header"
-        app:menu="@menu/sliding_menu">
+        app:menu="@menu/create_new_chat_menu">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,5 +65,6 @@
 
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
+
 
 </androidx.drawerlayout.widget.DrawerLayout>
