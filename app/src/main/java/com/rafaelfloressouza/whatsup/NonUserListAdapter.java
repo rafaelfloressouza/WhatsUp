@@ -2,7 +2,6 @@ package com.rafaelfloressouza.whatsup;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,22 @@ public class NonUserListAdapter extends RecyclerView.Adapter<NonUserListAdapter.
 
     public NonUserListAdapter(ArrayList<User> nonUserList) {
         this.nonUserList = nonUserList;
+    }
+
+    // View holder for Non-Users
+    public static class UserListViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView mName, mPhone;
+        public Button mButton;
+        public LinearLayout mLayout;
+
+        public UserListViewHolder(View view) {
+            super(view);
+            mName = view.findViewById(R.id.non_user_name);
+            mPhone = view.findViewById(R.id.non_user_phone);
+            mLayout = view.findViewById(R.id.non_user_item_layout);
+            mButton = view.findViewById(R.id.selection_button);
+        }
     }
 
     @NonNull
@@ -64,20 +79,5 @@ public class NonUserListAdapter extends RecyclerView.Adapter<NonUserListAdapter.
     @Override
     public int getItemCount() {
         return this.nonUserList.size();
-    }
-
-    public class UserListViewHolder extends RecyclerView.ViewHolder {
-
-        public TextView mName, mPhone;
-        public Button mButton;
-        public LinearLayout mLayout;
-
-        public UserListViewHolder(View view) {
-            super(view);
-            mName = view.findViewById(R.id.non_user_name);
-            mPhone = view.findViewById(R.id.non_user_phone);
-            mLayout = view.findViewById(R.id.non_user_item_layout);
-            mButton = view.findViewById(R.id.selection_button);
-        }
     }
 }

@@ -41,13 +41,14 @@ public class ChatActivity extends AppCompatActivity {
     // Constants
     int PICK_IMAGE_INTENT = 1;
 
-    // Toolbar variable
+    // Toolbar variables
     private Toolbar chat_toolbar;
 
     // Variables to connect code to layout.
     EditText mMessage;
     ImageButton mSendMessage;
     ImageButton mAddMedia;
+    TextView inChatOtherUserName;
 
     // // Variables for Recycler View Containing chats between two people.
     private RecyclerView mChat, mMedia;
@@ -57,7 +58,11 @@ public class ChatActivity extends AppCompatActivity {
     ArrayList<MessageObject> messageList; // Used to store all messages.
     ArrayList<String> mediaURIList; // Used to store URIs for images.
 
-    String chatID;
+    // Other Variables
+    private String otherUserName; // Used to keep track of the other user's name to set the chat name.
+    String chatID; // Used to keep track of the other chat ID that will connect to users.
+
+    // Database variables
     DatabaseReference mChatDB;
 
     @Override
@@ -65,19 +70,16 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        //Setting up the toolbar
-        chat_toolbar = findViewById(R.id.in_chat_toolbar);
-        setSupportActionBar(chat_toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        setUpToolBar();
 
         mediaURIList = new ArrayList<>();
-
         chatID = getIntent().getExtras().getString("chatID"); // Getting the chat id as an extra from other activity.
+
         mChatDB = FirebaseDatabase.getInstance().getReference().child("chat").child(chatID);
 
         mSendMessage = findViewById(R.id.send_button);
         mAddMedia = findViewById(R.id.media_button);
-        mMessage = (EditText) findViewById(R.id.message_input);
+        mMessage = findViewById(R.id.message_input);
 
         initializeMessage();
         initializeMedia();
@@ -96,108 +98,30 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    // onClickListener methods
     public void backButton(View view) {
-        // Returning back to the dashboard.
+        // onClickListener for back button on the chat's toolbar...
         startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-    }
-
-    private void getChatMessages() {
-
-        mChatDB.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if (dataSnapshot.exists()) {
-                    String text = "", creatorID = "", sent_at = "";
-
-                    if (dataSnapshot.child("text").getValue() != null) {
-                        text = dataSnapshot.child("text").getValue().toString();
-                    }
-                    if (dataSnapshot.child("creator").getValue() != null) {
-                        creatorID = dataSnapshot.child("creator").getValue().toString();
-                    }
-
-                    if(dataSnapshot.child("sent_at").getValue() != null){
-                        sent_at = dataSnapshot.child("sent_at").getValue().toString();
-                    }
-
-                    MessageObject mMessage = new MessageObject(dataSnapshot.getKey(), creatorID, text, sent_at);
-                    messageList.add(mMessage);
-                    mChatLayoutManager.scrollToPosition(messageList.size() - 1); // Scrolls to last chat elements.
-                    mChatAdapter.notifyDataSetChanged();
-                }
-            }
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        finish();
     }
 
     public void addMediaButton(View view) {
+        // On Click listener for the "add media button".
         openGallery();
-    }
-
-    private void openGallery() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture(s)"), PICK_IMAGE_INTENT);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RESULT_OK) {
-            if (requestCode == PICK_IMAGE_INTENT) {
-                if (data.getClipData() == null) { // User only picked one image.
-                    mediaURIList.add(data.getData().toString());
-                } else { // If user picks multiple images.
-                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
-                        mediaURIList.add(data.getClipData().getItemAt(i).getUri().toString());
-                    }
-                }
-                mMediaAdapter.notifyDataSetChanged();
-            }
-        }
     }
 
     public void sendMessageButton(View view) {
         sendMessage();
     }
 
-    private void sendMessage() {
-
-        if (!mMessage.getText().toString().isEmpty()) { // If there is a message to send.
-            DatabaseReference newMessageDB = mChatDB.push();
-            Map<String, Object> newMessageMap = new HashMap<>();
-            newMessageMap.put("text", mMessage.getText().toString());
-            newMessageMap.put("creator", FirebaseAuth.getInstance().getUid());
-
-            // Formmating the date
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yy");
-            LocalDateTime current_date = LocalDateTime.now();
-            newMessageMap.put("sent_at", current_date.format(dtf));
-
-            newMessageDB.updateChildren(newMessageMap);
-        }
-        mMessage.setText(null);
+    // Set up methods
+    public void setUpToolBar() {
+        chat_toolbar = findViewById(R.id.in_chat_toolbar);
+        setSupportActionBar(chat_toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        inChatOtherUserName = findViewById(R.id.in_char_other_user_name);
+        otherUserName = getIntent().getExtras().getString("otherUserName"); // Passing the name of the person we are chatting
+        inChatOtherUserName.setText(otherUserName);
     }
 
     private void initializeMessage() {
@@ -233,5 +157,99 @@ public class ChatActivity extends AppCompatActivity {
         // Setting up the Adapter
         mMediaAdapter = new MediaAdapter(getApplicationContext(), mediaURIList);
         mMedia.setAdapter(mMediaAdapter);
+    }
+
+    private void getChatMessages() {
+
+        mChatDB.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if (dataSnapshot.exists()) {
+                    String text = "", creatorID = "", sent_at = "";
+
+                    if (dataSnapshot.child("text").getValue() != null) {
+                        text = dataSnapshot.child("text").getValue().toString();
+                    }
+                    if (dataSnapshot.child("creator").getValue() != null) {
+                        creatorID = dataSnapshot.child("creator").getValue().toString();
+                    }
+
+                    if (dataSnapshot.child("sent_at").getValue() != null) {
+                        sent_at = dataSnapshot.child("sent_at").getValue().toString();
+                    }
+
+                    MessageObject mMessage = new MessageObject(dataSnapshot.getKey(), creatorID, text, sent_at);
+                    messageList.add(mMessage);
+                    mChatLayoutManager.scrollToPosition(messageList.size() - 1); // Scrolls to last chat elements.
+                    mChatAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    // Action methods
+    private void sendMessage() {
+
+        if (!mMessage.getText().toString().isEmpty()) { // If there is a message to send.
+            DatabaseReference newMessageDB = mChatDB.push();
+            Map<String, Object> newMessageMap = new HashMap<>();
+            newMessageMap.put("text", mMessage.getText().toString());
+            newMessageMap.put("creator", FirebaseAuth.getInstance().getUid());
+
+            // Formmating the date
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yy");
+            LocalDateTime current_date = LocalDateTime.now();
+            newMessageMap.put("sent_at", current_date.format(dtf));
+
+            newMessageDB.updateChildren(newMessageMap);
+        }
+        mMessage.setText(null);
+    }
+
+    // Other methods
+    private void openGallery() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture(s)"), PICK_IMAGE_INTENT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE_INTENT) {
+                if (data.getClipData() == null) { // User only picked one image.
+                    mediaURIList.add(data.getData().toString());
+                } else { // If user picks multiple images.
+                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                        mediaURIList.add(data.getClipData().getItemAt(i).getUri().toString());
+                    }
+                }
+                mMediaAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }

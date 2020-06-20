@@ -10,9 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class CallsFragment extends Fragment {
 
     View viewToInflate;
@@ -20,7 +17,6 @@ public class CallsFragment extends Fragment {
     public CallsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

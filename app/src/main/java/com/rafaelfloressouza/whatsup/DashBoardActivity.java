@@ -52,16 +52,6 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
     private Toolbar toolbar;
     private PagerAdapter mPagerAdapter;
 
-    // Variables for Recycler View inside Navigation View Containing Users of the App
-    private RecyclerView mUserList;
-    private RecyclerView.Adapter mUserListAdapter;
-    private RecyclerView.LayoutManager mUserLayoutManager;
-
-    // Variables for Recycler View inside Navigation View Containing Non-Users of the App
-    private RecyclerView mNonUserList;
-    private RecyclerView.Adapter mNonUserListAdapter;
-    private RecyclerView.LayoutManager mNonUserLayoutManager;
-
     // Lists to store Users and Non-Users of the App
     ArrayList<User> userList, contactList, nonUserList;
 
@@ -75,10 +65,6 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
         userList = new ArrayList<>();
         nonUserList = new ArrayList<>();
-
-        // Set up User and Non-User Recycler View
-        initializeUserRecyclerView();
-        initializeNonUserRecyclerView();
 
         getContacts(); // Populating userList and nonUserList with the right contacts on phone.
         getPermissionToAccessContacts();
@@ -102,7 +88,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_users_base_green);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount(), userMap, null);
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount(), userMap, userList, nonUserList,null);
         mViewPager.setAdapter(mPagerAdapter);
 
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -122,7 +108,6 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
             }
         });
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mUserListAdapter.notifyDataSetChanged();
     }
 
     private void connectVariablesToLayout() {
@@ -183,6 +168,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
     private void getContacts() {
 
+        //TODO: MOVE THIS TO THE APPROPRIATE PLACE
         userMap = new HashMap<>();
 
         Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
@@ -212,6 +198,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
 
     private void getUserDetails(final User newContact) {
 
+        //TODO: MOVE THIS TO THE APPROPRIATE PLACE
         final DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
         final Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
 
@@ -232,17 +219,11 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
                             if (childSnapshot.child("phone").getValue() != null) {
                                 phone = childSnapshot.child("phone").getValue().toString();
                             }
-
                             userList.add(new User(userId, userMap.get(phone), phone));
-                            mUserListAdapter.notifyDataSetChanged();
-
                         }
                     }
                 } else { // User not found on Firebase
-
                     nonUserList.add(newContact);
-                    mNonUserListAdapter.notifyDataSetChanged();
-
                 }
             }
 
@@ -267,35 +248,4 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         return CountryToPhonePrefix.getPhone(iso);
     }
 
-    private void initializeNonUserRecyclerView() {
-
-        // Setting up Recycler View
-        mNonUserList = findViewById(R.id.non_user_list);
-        mNonUserList.setNestedScrollingEnabled(false); // Making the recycler view scroll seemlesly.
-        mNonUserList.setHasFixedSize(false);
-
-        // Setting up Layout Manager
-        mNonUserLayoutManager = new LinearLayoutManager(DashBoardActivity.this, RecyclerView.VERTICAL, false);
-        mNonUserList.setLayoutManager(mNonUserLayoutManager);
-
-        // Setting up the Adapter
-        mNonUserListAdapter = new NonUserListAdapter(nonUserList);
-        mNonUserList.setAdapter(mNonUserListAdapter);
-    }
-
-    private void initializeUserRecyclerView() {
-
-        // Setting up Recycler View
-        mUserList = findViewById(R.id.user_list);
-        mUserList.setNestedScrollingEnabled(false); // Making the recycler view scroll seemlesly.
-        mUserList.setHasFixedSize(false);
-
-        //  Setting up Layout Manager
-        mUserLayoutManager = new LinearLayoutManager(DashBoardActivity.this, RecyclerView.VERTICAL, false);
-        mUserList.setLayoutManager(mUserLayoutManager);
-
-        // Setting up the Adapter
-        mUserListAdapter = new UserListAdapter(userList);
-        mUserList.setAdapter(mUserListAdapter);
-    }
 }

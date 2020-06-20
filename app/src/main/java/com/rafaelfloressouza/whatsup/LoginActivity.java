@@ -202,7 +202,6 @@ public class LoginActivity extends AppCompatActivity {
 
         // Verifying a new phone number for which no verification code has been issued.
         String phoneNumber =  mSpinner.getFullNumberWithPlus();
-//        String phoneNumber = mNumberTextView.getText().toString();
         mPhoneAuth.verifyPhoneNumber(phoneNumber, TIMEOUT_DURATION, TimeUnit.SECONDS, this, mCallbacks);
     }
 

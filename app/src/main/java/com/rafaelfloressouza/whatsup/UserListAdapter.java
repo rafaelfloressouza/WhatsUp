@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,8 +22,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserListViewHolder> {
 
@@ -111,7 +107,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
                                         Log.d("WhatsUp", "error: " + e.toString());
                                     }
                                 }
-                            }, 1000);
+                            }, 500);
 
                         }
                     }
@@ -130,7 +126,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
         return this.userList.size();
     }
 
-    public class UserListViewHolder extends RecyclerView.ViewHolder {
+    public static class UserListViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mName, mPhone;
         public LinearLayout mLayout;

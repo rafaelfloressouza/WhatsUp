@@ -38,18 +38,24 @@ public class ChatsFragment extends Fragment {
 
     View viewToInflate;
 
+    // Variables for setting up the chats recycler view
     private RecyclerView mChatList;
     private RecyclerView.Adapter mChatAdapter;
     private RecyclerView.LayoutManager mChatLayoutManager;
 
-    ArrayList<Chat> chatList;
-    Map<String, String> userMap;
+    // Data structures to store chats, users, nonuser.
+    private ArrayList<Chat> chatList;
+    private ArrayList<User> userList;
+    private Map<String, String> userMap;
+    private ArrayList<User> nonUserList;
 
-    FloatingActionButton newChatButton;
+    // Buttons
+    private FloatingActionButton newChatButton;
 
-
-    public ChatsFragment(Map<String, String> userMap) {
+    public ChatsFragment(Map<String, String> userMap, ArrayList<User> userList, ArrayList<User> nonUserList) {
         this.userMap = userMap;
+        this.userList = userList;
+        this.nonUserList = nonUserList;
     }
 
     @Override
@@ -59,20 +65,19 @@ public class ChatsFragment extends Fragment {
 
         newChatButton = viewToInflate.findViewById(R.id.new_chat_button);
 
+        // Takes us to create a new chat or go to an existing chat.
         newChatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(viewToInflate.getContext(), "Pressed", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(), CreateNewChatActivity.class);
-//                Bundle bundle = new Bundle();
-//                bundle.putString("chatID",chatList.get(holder.getAdapterPosition()).getChatId());
-//                intent.putExtras(bundle);
+                intent.putParcelableArrayListExtra("userList", userList);
+                intent.putParcelableArrayListExtra("nonUserList", nonUserList);
                 v.getContext().startActivity(intent);
             }
         });
 
-        initializeRecyclerView(); // Initializing all variables.
-        getChatList(); // Getting all chats for the respective user.
+        initializeRecyclerView();
+        getChatList();
 
         return viewToInflate;
     }

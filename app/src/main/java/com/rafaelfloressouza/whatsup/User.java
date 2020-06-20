@@ -1,7 +1,10 @@
 package com.rafaelfloressouza.whatsup;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 // Class used to represets a user with respective characteristics
-public class User {
+public class User implements Parcelable {
 
     private String name;
     private String phone;
@@ -32,5 +35,37 @@ public class User {
 
     public String getUid() {
         return uid;
+    }
+
+    protected User(Parcel in) {
+        name = in.readString();
+        phone = in.readString();
+        uid = in.readString();
+        image = in.readInt();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(phone);
+        dest.writeString(uid);
+        dest.writeInt(image);
     }
 }
