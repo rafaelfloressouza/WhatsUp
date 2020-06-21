@@ -9,7 +9,7 @@
     android:paddingTop="10dp"
     android:paddingRight="10dp"
     android:paddingBottom="10dp"
-    tools:context=".LoginActivity">
+    tools:context=".Activities.LoginActivity">
 
 
     <ImageView

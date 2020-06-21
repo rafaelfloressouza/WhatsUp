@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Utilities;
 
 import android.content.Context;
 import android.graphics.Rect;

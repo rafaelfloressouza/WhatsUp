@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Fragments;
 
 
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.rafaelfloressouza.whatsup.R;
+
 import java.util.Map;
 
 
@@ -16,10 +18,8 @@ public class GroupsFragment extends Fragment {
 
     View viewToInflate;
 
-    Map<String, String> groupMap;
 
-    public GroupsFragment(Map<String, String> groupMap) {
-        this.groupMap = groupMap;
+    public GroupsFragment() {
     }
 
 

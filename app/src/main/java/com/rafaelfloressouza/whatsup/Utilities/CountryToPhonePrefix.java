@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Utilities;
 
 import java.util.HashMap;
 import java.util.Map;

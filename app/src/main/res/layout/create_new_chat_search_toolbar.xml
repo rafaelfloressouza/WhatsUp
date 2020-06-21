@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:theme="@style/CustomToolbarTheme"
+    android:id="@+id/create_new_chat_search_toolbar"
+    android:elevation="10dp">
+
+</androidx.appcompat.widget.Toolbar>

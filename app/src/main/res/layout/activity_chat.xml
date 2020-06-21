@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/dark_grey"
     android:id="@+id/chat_activity_relative_layout"
-    tools:context="com.rafaelfloressouza.whatsup.ChatActivity">
+    tools:context="com.rafaelfloressouza.whatsup.Activities.ChatActivity">
 
 
     <include

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.rafaelfloressouza.whatsup.DashBoardActivity">
+    tools:context="com.rafaelfloressouza.whatsup.Activities.DashBoardActivity">
 
     <include
         layout="@layout/dashboard_content"

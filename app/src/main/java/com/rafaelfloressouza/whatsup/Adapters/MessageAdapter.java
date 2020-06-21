@@ -1,6 +1,5 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Adapters;
 
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,13 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.rafaelfloressouza.whatsup.Objects.MessageObject;
+import com.rafaelfloressouza.whatsup.R;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
@@ -26,6 +22,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public MessageAdapter(ArrayList<MessageObject> messageObjectList) {
         this.messageList = messageObjectList;
+    }
+
+    // ViewHolder for messages..
+    public static class MessageViewHolder extends RecyclerView.ViewHolder {
+
+        TextView mMessage, sent_at;
+        LinearLayout mLayout;
+        LinearLayout inChatLayout;
+
+        MessageViewHolder(View view) {
+            super(view);
+            mMessage = view.findViewById(R.id.in_chat_message);
+            mLayout = view.findViewById(R.id.linear_layout_message_item);
+            inChatLayout = view.findViewById(R.id.in_chat_linear_layout);
+            sent_at = view.findViewById(R.id.in_chat_sent_at);
+        }
     }
 
     @NonNull
@@ -51,7 +63,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         if (!messageList.get(position).getSenderId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
 
             // Some else's message
-
             holder.mLayout.setGravity(Gravity.LEFT);
 
             if (holder.mMessage.length() <= 7) {
@@ -79,24 +90,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }
     }
 
-
     @Override
     public int getItemCount() {
         return this.messageList.size();
-    }
-
-    class MessageViewHolder extends RecyclerView.ViewHolder {
-
-        TextView mMessage, sent_at;
-        LinearLayout mLayout;
-        LinearLayout inChatLayout;
-
-        MessageViewHolder(View view) {
-            super(view);
-            mMessage = view.findViewById(R.id.in_chat_message);
-            mLayout = view.findViewById(R.id.linear_layout_message_item);
-            inChatLayout = view.findViewById(R.id.in_chat_linear_layout);
-            sent_at = view.findViewById(R.id.in_chat_sent_at);
-        }
     }
 }

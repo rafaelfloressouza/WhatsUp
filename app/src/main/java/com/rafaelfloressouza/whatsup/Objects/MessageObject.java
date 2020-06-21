@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Objects;
 
 import java.util.Date;
 

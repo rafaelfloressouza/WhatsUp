@@ -27,7 +27,6 @@
     </style>
 
 
-
     <style name="CustomEditTextTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:textColor">@color/white</item>
         <item name="colorControlNormal">@color/light_gray</item>

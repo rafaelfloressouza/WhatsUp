@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Fragments;
 
 
 import android.content.Intent;
@@ -10,30 +10,29 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.renderscript.Sampler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.rafaelfloressouza.whatsup.Adapters.ChatListAdapter;
+import com.rafaelfloressouza.whatsup.Utilities.Contacts;
+import com.rafaelfloressouza.whatsup.Objects.Chat;
+import com.rafaelfloressouza.whatsup.Activities.CreateNewChatActivity;
+import com.rafaelfloressouza.whatsup.R;
+import com.rafaelfloressouza.whatsup.Objects.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class ChatsFragment extends Fragment {
 
     View viewToInflate;
@@ -45,18 +44,20 @@ public class ChatsFragment extends Fragment {
 
     // Data structures to store chats, users, nonuser.
     private ArrayList<Chat> chatList;
-    private ArrayList<User> userList;
-    private Map<String, String> userMap;
-    private ArrayList<User> nonUserList;
+    private ArrayList<User> userList = new ArrayList<>();
+    private Map<String, String> userMap = new HashMap<>();
+    private ArrayList<User> nonUserList = new ArrayList<>();
 
     // Buttons
     private FloatingActionButton newChatButton;
 
-    public ChatsFragment(Map<String, String> userMap, ArrayList<User> userList, ArrayList<User> nonUserList) {
-        this.userMap = userMap;
-        this.userList = userList;
-        this.nonUserList = nonUserList;
+    public ChatsFragment() {
+        this.userMap = Contacts.GetUsersAndNonUsers.getUserMap();
+        this.userList = Contacts.GetUsersAndNonUsers.getUserList();
+        this.nonUserList = Contacts.GetUsersAndNonUsers.getNonUserList();
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,8 +71,7 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CreateNewChatActivity.class);
-                intent.putParcelableArrayListExtra("userList", userList);
-                intent.putParcelableArrayListExtra("nonUserList", nonUserList);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 v.getContext().startActivity(intent);
             }
         });

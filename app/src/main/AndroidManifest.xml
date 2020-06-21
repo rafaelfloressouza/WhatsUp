@@ -11,10 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CreateNewChatActivity"></activity>
-        <activity android:name=".ChatActivity" />
-        <activity android:name=".DashBoardActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Activities.CreateNewChatActivity"></activity>
+        <activity android:name=".Activities.ChatActivity" />
+        <activity android:name=".Activities.DashBoardActivity" />
+        <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

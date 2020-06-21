@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.rafaelfloressouza.whatsup.R;
 
 import java.util.ArrayList;
 

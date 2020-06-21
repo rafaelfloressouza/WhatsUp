@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,11 +13,8 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,9 +32,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
+import com.rafaelfloressouza.whatsup.R;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Objects;
 
 import android.os.Parcel;
 import android.os.Parcelable;

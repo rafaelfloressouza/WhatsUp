@@ -1,5 +1,6 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Adapters;
 
+import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,18 +18,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.rafaelfloressouza.whatsup.Activities.ChatActivity;
+import com.rafaelfloressouza.whatsup.Activities.DashBoardActivity;
+import com.rafaelfloressouza.whatsup.Activities.LoginActivity;
+import com.rafaelfloressouza.whatsup.R;
+import com.rafaelfloressouza.whatsup.Objects.User;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserListViewHolder> {
 
     private ArrayList<User> userList;
+    private Map<String, String> userMap;
 
-    public UserListAdapter(ArrayList<User> userList) {
+    public UserListAdapter(ArrayList<User> userList, Map<String, String> userMap) {
         this.userList = userList;
+        this.userMap = userMap;
     }
 
     @NonNull
@@ -82,7 +92,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
 
                         final String new_chat_id = chatID;
 
-
                         if (!otherUserFound) {
 
                             // No chat exists between the users.
@@ -92,23 +101,35 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
 
                         } else {
 
-                            // Users already have a chat, so we go to their activity
+                            // Users already have a chat, so we go to their chat activity
                             Toast.makeText(v.getContext(), "Going to Chat", Toast.LENGTH_SHORT).show();
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
+                            try {
+
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("user").child(otherUserId).child("phone");
+
+                                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        final String otherUserPhone = dataSnapshot.getValue().toString();
+
                                         Intent intent = new Intent(v.getContext(), ChatActivity.class);
                                         Bundle bundle = new Bundle();
                                         bundle.putString("chatID", new_chat_id);
+                                        bundle.putString("otherUserName", userMap.get(otherUserPhone));
                                         intent.putExtras(bundle);
                                         v.getContext().startActivity(intent);
-                                    } catch (Exception e) {
-                                        Log.d("WhatsUp", "error: " + e.toString());
                                     }
-                                }
-                            }, 500);
 
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
+                            } catch (Exception e) {
+                                Log.d("WhatsUp", "error: " + e.toString());
+                            }
                         }
                     }
 

@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Adapters;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.rafaelfloressouza.whatsup.Objects.Chat;
+import com.rafaelfloressouza.whatsup.Activities.ChatActivity;
+import com.rafaelfloressouza.whatsup.R;
 
 import java.util.ArrayList;
 

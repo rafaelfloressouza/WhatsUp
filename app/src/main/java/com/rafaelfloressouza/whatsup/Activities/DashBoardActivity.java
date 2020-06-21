@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -6,36 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
 import android.Manifest;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract;
-import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import com.rafaelfloressouza.whatsup.Adapters.PagerAdapter;
+import com.rafaelfloressouza.whatsup.Utilities.Contacts;
+import com.rafaelfloressouza.whatsup.R;
 
 public class DashBoardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -53,20 +38,26 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
     private PagerAdapter mPagerAdapter;
 
     // Lists to store Users and Non-Users of the App
-    ArrayList<User> userList, contactList, nonUserList;
+//    ArrayList<User> userList, contactList, nonUserList;
 
     // Maps to ease search of names of users who use the app by using their phone numbers
-    private Map<String, String> userMap;
+//    private Map<String, String> userMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        userList = new ArrayList<>();
-        nonUserList = new ArrayList<>();
+//        userList = new ArrayList<>();
+//        nonUserList = new ArrayList<>();
 
-        getContacts(); // Populating userList and nonUserList with the right contacts on phone.
+//        getContacts();
+//        .
+
+        //Populating userList and nonUserList in GetUsersAndNonUsers class with the right contacts on phone
+        Contacts.GetUsersAndNonUsers.setContext(getApplicationContext());
+        Contacts.GetUsersAndNonUsers.getContacts();
+
         getPermissionToAccessContacts();
 
         // Setting up the toolbar.
@@ -88,7 +79,7 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_users_base_green);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount(), userMap, userList, nonUserList,null);
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTabLayout.getTabCount());
         mViewPager.setAdapter(mPagerAdapter);
 
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -166,86 +157,86 @@ public class DashBoardActivity extends AppCompatActivity implements NavigationVi
         }
     }
 
-    private void getContacts() {
-
-        //TODO: MOVE THIS TO THE APPROPRIATE PLACE
-        userMap = new HashMap<>();
-
-        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-        String countryISO = getCountryISO();
-
-        while (phones.moveToNext()) { // While there is a contact
-            String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phone = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-            // Making sure the phone numbers will be in only one format
-            phone = phone.replace(" ", "");
-            phone = phone.replace("-", "");
-            phone = phone.replace("(", "");
-            phone = phone.replace(")", "");
-
-            if (!String.valueOf(phone.charAt(0)).equals("+")) {
-                phone = countryISO + phone;
-            }
-
-            User newContact = new User("", name, phone);
-            userMap.put(phone, name);
-
-            getUserDetails(newContact);
-        }
-        phones.close(); // Closing the phones Cursor.
-    }
-
-    private void getUserDetails(final User newContact) {
-
-        //TODO: MOVE THIS TO THE APPROPRIATE PLACE
-        final DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
-        final Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
-
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.exists()) { // User found on Firebase....
-
-                    String phone = "", name = "", userId = "";
-
-                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-
-                        if (childSnapshot.exists()) {
-
-                            userId = childSnapshot.getKey();
-
-                            if (childSnapshot.child("phone").getValue() != null) {
-                                phone = childSnapshot.child("phone").getValue().toString();
-                            }
-                            userList.add(new User(userId, userMap.get(phone), phone));
-                        }
-                    }
-                } else { // User not found on Firebase
-                    nonUserList.add(newContact);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private String getCountryISO() {
-        String iso = null;
-
-        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(getApplicationContext().TELEPHONY_SERVICE);
-        if (telephonyManager.getNetworkCountryIso() != null) {
-
-            if (!telephonyManager.getNetworkCountryIso().toString().equals("")) {
-                iso = telephonyManager.getNetworkCountryIso().toString();
-            }
-        }
-
-        return CountryToPhonePrefix.getPhone(iso);
-    }
+//    private void getContacts() {
+//
+//        //TODO: MOVE THIS TO THE APPROPRIATE PLACE
+//        userMap = new HashMap<>();
+//
+//        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+//        String countryISO = getCountryISO();
+//
+//        while (phones.moveToNext()) { // While there is a contact
+//            String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+//            String phone = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+//
+//            // Making sure the phone numbers will be in only one format
+//            phone = phone.replace(" ", "");
+//            phone = phone.replace("-", "");
+//            phone = phone.replace("(", "");
+//            phone = phone.replace(")", "");
+//
+//            if (!String.valueOf(phone.charAt(0)).equals("+")) {
+//                phone = countryISO + phone;
+//            }
+//
+//            User newContact = new User("", name, phone);
+//            userMap.put(phone, name);
+//
+//            getUserDetails(newContact);
+//        }
+//        phones.close(); // Closing the phones Cursor.
+//    }
+//
+//    private void getUserDetails(final User newContact) {
+//
+//        //TODO: MOVE THIS TO THE APPROPRIATE PLACE
+//        final DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference().child("user");
+//        final Query query = mDataBase.orderByChild("phone").equalTo(newContact.getPhone());
+//
+//        query.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                if (dataSnapshot.exists()) { // User found on Firebase....
+//
+//                    String phone = "", name = "", userId = "";
+//
+//                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+//
+//                        if (childSnapshot.exists()) {
+//
+//                            userId = childSnapshot.getKey();
+//
+//                            if (childSnapshot.child("phone").getValue() != null) {
+//                                phone = childSnapshot.child("phone").getValue().toString();
+//                            }
+//                            userList.add(new User(userId, userMap.get(phone), phone));
+//                        }
+//                    }
+//                } else { // User not found on Firebase
+//                    nonUserList.add(newContact);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
+//
+//    private String getCountryISO() {
+//        String iso = null;
+//
+//        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+//        if (telephonyManager.getNetworkCountryIso() != null) {
+//
+//            if (!telephonyManager.getNetworkCountryIso().toString().equals("")) {
+//                iso = telephonyManager.getNetworkCountryIso().toString();
+//            }
+//        }
+//
+//        return CountryToPhonePrefix.getPhone(iso);
+//    }
 
 }

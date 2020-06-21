@@ -1,4 +1,4 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Adapters;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +12,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.rafaelfloressouza.whatsup.R;
+import com.rafaelfloressouza.whatsup.Objects.User;
 
 import java.util.ArrayList;
 

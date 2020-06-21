@@ -1,11 +1,11 @@
-package com.rafaelfloressouza.whatsup;
+package com.rafaelfloressouza.whatsup.Activities;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -13,11 +13,9 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,13 +24,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.w3c.dom.Text;
+import com.rafaelfloressouza.whatsup.Adapters.MediaAdapter;
+import com.rafaelfloressouza.whatsup.Utilities.ChatActivityItemDecorator;
+import com.rafaelfloressouza.whatsup.Adapters.MessageAdapter;
+import com.rafaelfloressouza.whatsup.Objects.MessageObject;
+import com.rafaelfloressouza.whatsup.R;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,6 +96,15 @@ public class ChatActivity extends AppCompatActivity {
                 return handled;
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(ChatActivity.this, DashBoardActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 
     // onClickListener methods
