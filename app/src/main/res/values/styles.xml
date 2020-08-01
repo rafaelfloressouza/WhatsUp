@@ -8,12 +8,13 @@
         <item name="colorAccent">@color/green</item>
         <item name="android:actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>
         <item name="android:listDivider">@drawable/custom_list_divider</item>
+        <item name="android:actionMenuTextColor">@color/base_green</item>
     </style>
 
     <!--For the Dashboard's Toolbar-->
     <style name="CustomToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:background">@color/dark_grey</item>
-        <item name="colorControlNormal">@color/light_gray</item>
+        <item name="colorControlNormal">@color/white</item>
     </style>
 
     <!--For the Chats's Toolbar-->

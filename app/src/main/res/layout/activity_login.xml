@@ -13,12 +13,14 @@
 
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
 
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/icon_no_background"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/country_code_spinner"/>
 
@@ -39,9 +41,8 @@
         app:ccp_countryPreference="US"
         app:ccp_countryAutoDetectionPref="SIM_NETWORK_LOCALE"
 
-
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toTopOf="@id/phone_number_layout"/>
 

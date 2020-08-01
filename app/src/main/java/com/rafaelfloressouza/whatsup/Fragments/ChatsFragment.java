@@ -29,6 +29,8 @@ import com.rafaelfloressouza.whatsup.Activities.CreateNewChatActivity;
 import com.rafaelfloressouza.whatsup.R;
 import com.rafaelfloressouza.whatsup.Objects.User;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,9 +46,9 @@ public class ChatsFragment extends Fragment {
 
     // Data structures to store chats, users, nonuser.
     private ArrayList<Chat> chatList;
-    private ArrayList<User> userList = new ArrayList<>();
-    private Map<String, String> userMap = new HashMap<>();
-    private ArrayList<User> nonUserList = new ArrayList<>();
+    private ArrayList<User> userList;
+    private Map<String, String> userMap;
+    private ArrayList<User> nonUserList;
 
     // Buttons
     private FloatingActionButton newChatButton;
@@ -56,8 +58,6 @@ public class ChatsFragment extends Fragment {
         this.userList = Contacts.GetUsersAndNonUsers.getUserList();
         this.nonUserList = Contacts.GetUsersAndNonUsers.getNonUserList();
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,6 +98,7 @@ public class ChatsFragment extends Fragment {
                         q.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshotII) {
+
                                 Chat mChat = new Chat(chatSnapshot.getKey(), userMap.get(snapshotII.getValue().toString()));
                                 chatList.add(mChat);
                                 mChatAdapter.notifyDataSetChanged();

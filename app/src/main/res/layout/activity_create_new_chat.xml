@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_weight="0.9"
+            android:backgroundTint="@color/white"
             android:textColor="@color/white" />
 
         <ImageView
@@ -32,8 +33,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="20dp"
             android:layout_weight="0.1"
-            android:scaleX="1.2"
-            android:scaleY="1.2"
+            android:scaleX="1.4"
+            android:scaleY="1.4"
             android:src="@drawable/ic_search_white" />
 
     </LinearLayout>

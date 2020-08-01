@@ -37,12 +37,12 @@ public class CreateNewChatActivity extends AppCompatActivity {
 
     // Variables for Recycler View inside Navigation View Containing Users of the App
     private RecyclerView mUserList;
-    private RecyclerView.Adapter mUserListAdapter;
+    private UserListAdapter mUserListAdapter;
     private RecyclerView.LayoutManager mUserLayoutManager;
 
     // Variables for Recycler View inside Navigation View Containing Non-Users of the App
     private RecyclerView mNonUserList;
-    private RecyclerView.Adapter mNonUserListAdapter;
+    private NonUserListAdapter mNonUserListAdapter;
     private RecyclerView.LayoutManager mNonUserLayoutManager;
 
 
@@ -84,12 +84,9 @@ public class CreateNewChatActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-//                filter(s.toString())
+                filter(s.toString());
             }
         });
-
-
-
     }
 
     @Override
@@ -145,5 +142,16 @@ public class CreateNewChatActivity extends AppCompatActivity {
         // Setting up the Adapter
         mUserListAdapter = new UserListAdapter(userList, userMap);
         mUserList.setAdapter(mUserListAdapter);
+    }
+
+    private void filter(String text){
+        ArrayList<User> filteredList = new ArrayList<>();
+
+        for(User user : userList){
+            if(user.getName().toLowerCase().contains(text.toLowerCase())){
+                filteredList.add(user);
+            }
+        }
+        this.mUserListAdapter.filterList(filteredList);
     }
 }

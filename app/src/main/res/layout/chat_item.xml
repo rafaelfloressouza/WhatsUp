@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chat_item_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,24 +17,40 @@
         android:paddingBottom="5sp"
         android:weightSum="1">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleY="0.8"
-            android:scaleX="0.8"
-            android:layout_weight="0.8"
-            android:src="@mipmap/ic_launcher_round" />
+        <androidx.cardview.widget.CardView
+            android:layout_width="50sp"
+            android:layout_height="50sp"
+            app:cardCornerRadius="250dp"
+            android:layout_gravity="center">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="50sp"
+                app:cardBackgroundColor="@color/light_gray"
+                android:layout_height="50sp"
+                app:cardCornerRadius="250dp"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="35sp"
+                    android:layout_height="35sp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/icon_no_background" />
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.cardview.widget.CardView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_weight="0.2">
+            android:layout_weight="0.999">
 
             <TextView
                 android:id="@+id/chat_title"
                 android:layout_marginTop="12dp"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"

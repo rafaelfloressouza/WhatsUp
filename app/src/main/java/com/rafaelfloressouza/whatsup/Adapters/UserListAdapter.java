@@ -1,9 +1,7 @@
 package com.rafaelfloressouza.whatsup.Adapters;
 
-import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +9,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,11 +19,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.rafaelfloressouza.whatsup.Activities.ChatActivity;
-import com.rafaelfloressouza.whatsup.Activities.DashBoardActivity;
-import com.rafaelfloressouza.whatsup.Activities.LoginActivity;
 import com.rafaelfloressouza.whatsup.R;
 import com.rafaelfloressouza.whatsup.Objects.User;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -39,6 +32,24 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
     public UserListAdapter(ArrayList<User> userList, Map<String, String> userMap) {
         this.userList = userList;
         this.userMap = userMap;
+    }
+
+    public static class UserListViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView mName, mPhone;
+        public LinearLayout mLayout;
+
+        public UserListViewHolder(View view) {
+            super(view);
+            mName = view.findViewById(R.id.user_name);
+            mPhone = view.findViewById(R.id.user_phone);
+            mLayout = view.findViewById(R.id.user_item_layout);
+        }
+    }
+
+    public void filterList(ArrayList<User> filteredList){
+        userList = filteredList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -145,18 +156,5 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
     @Override
     public int getItemCount() {
         return this.userList.size();
-    }
-
-    public static class UserListViewHolder extends RecyclerView.ViewHolder {
-
-        public TextView mName, mPhone;
-        public LinearLayout mLayout;
-
-        public UserListViewHolder(View view) {
-            super(view);
-            mName = view.findViewById(R.id.user_name);
-            mPhone = view.findViewById(R.id.user_phone);
-            mLayout = view.findViewById(R.id.user_item_layout);
-        }
     }
 }

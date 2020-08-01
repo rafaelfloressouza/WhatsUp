@@ -8,10 +8,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/contacts"
+        android:text="Profile"
+        android:elevation="25dp"
         android:textAlignment="center"
         android:textColor="@color/base_green"
-        android:textSize="17sp"
-        android:padding="5dp"
+        android:textSize="20sp"
+        android:padding="10dp"
         android:textStyle="bold"/>
 </LinearLayout>

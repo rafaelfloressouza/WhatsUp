@@ -15,6 +15,8 @@ import com.rafaelfloressouza.whatsup.Objects.Chat;
 import com.rafaelfloressouza.whatsup.Activities.ChatActivity;
 import com.rafaelfloressouza.whatsup.R;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatListViewHolder> {
@@ -29,12 +31,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
     public class ChatListViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mTitle;
+        public TextView mDate;
         LinearLayout mLayout;
 
         public ChatListViewHolder(View view) {
             super(view);
 
             mTitle = view.findViewById(R.id.chat_title);
+            mDate = view.findViewById(R.id.chat_date);
             mLayout = view.findViewById(R.id.chat_item_layout);
         }
     }
@@ -58,6 +62,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
         // Setting respective Chat's name and picture
         holder.mTitle.setText(chatList.get(position).getName());
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yy");
+        LocalDateTime current_date = LocalDateTime.now();
+        holder.mDate.setText(current_date.format(dtf)); // TODO: Change this to show the right date depending on the chat...
+
         // Used to take us to the right chat...
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,4 +84,13 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatLi
     public int getItemCount() {
         return this.chatList.size();
     }
+
+//    public void set_date(String last_date, String user_name){
+//        for(int i = 0; i < chatList.size() ; i++){
+//            if(chatList.get(i).getName().equals(user_name)){
+//                chatList.get(i).setChatDate(last_date);
+//                notifyDataSetChanged();
+//            }
+//        }
+//    }
 }

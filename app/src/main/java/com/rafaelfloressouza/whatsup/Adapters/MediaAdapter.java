@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
 
-
     ArrayList<String> mediaList;
     Context context;
 
@@ -37,7 +36,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
 
     @Override
     public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
-
         // Using glide library to put image inside Recycler View.
         Glide.with(context).load(Uri.parse(mediaList.get(position))).into(holder.mMedia);
     }
